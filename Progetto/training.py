@@ -1,0 +1,78 @@
+import cv2
+import numpy as np
+from PIL import Image
+import os
+import speaker_verification_toolkit.tools as svt
+from sklearn import preprocessing
+import librosa
+import sklearn.mixture
+import numpy
+import pickle
+
+# Acquisizione di immagini e labels
+def face_model():
+
+    # Path for face image database
+    path = 'Dataset/'
+
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    detector = cv2.CascadeClassifier("CascadeClassifier/haarcascade_frontalface_default.xml")
+
+    imagePaths = [os.path.join(path, f) for f in os.listdir(path)]
+    faceSamples=[]
+    ids = []
+
+    for imagePath in imagePaths:
+
+        PIL_img = Image.open(imagePath).convert('L')  # convert it to grayscale
+        img_numpy = np.array(PIL_img, 'uint8')
+
+        id = int(os.path.split(imagePath)[-1].split(".")[1])
+        faces = detector.detectMultiScale(img_numpy)
+
+        for (x,y,w,h) in faces:
+            faceSamples.append(img_numpy[y:y+h, x:x+w])
+            ids.append(id)
+
+
+    print("\n Fase di addestramento. Attendere...")
+    recognizer.train(faceSamples, np.array(ids))
+
+
+
+    # Salvo il modello
+    recognizer.write('./Trainer/trainer.yml')
+
+    # Stampo il numero di facce imparate
+    print("\n [INFO] {0} Facce unoarate. Uscita in corso...".format(len(np.unique(ids))))
+
+def voice_model (nomefile, audio_number):
+
+    AUDIO_FILE = './Registrazioni/input1000.wav'
+
+    data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
+    data = svt.rms_silence_filter(data)
+    mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
+    mfcc = preprocessing.scale(mfcc)
+    delta = librosa.feature.delta(mfcc)
+    combined = numpy.hstack((mfcc, delta))
+
+    results = numpy.asmatrix(())
+    for i in range(1, audio_number + 1):
+        mfcc = combined
+        i += 1
+
+        if i == 2:
+            results = mfcc
+        else:
+            results = numpy.vstack((results, mfcc))
+
+    model = sklearn.mixture.GaussianMixture(n_components=audio_number + 1, covariance_type='diag', n_init=3)
+    model.fit(results)
+    # Estimate model parameters with the EM algorithm. expectation maximization
+
+    filename = './Trainer/model' + nomefile + ".gmm"
+    pickle.dump(model, open(filename, 'wb'))
+
+face_model()
+voice_model('modello', 1)
