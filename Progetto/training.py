@@ -66,7 +66,7 @@ def voice_model (nomefile, audio_number):
         else:
             results = numpy.vstack((results, mfcc))
 
-    model = sklearn.mixture.GaussianMixture(n_components=audio_number + 1, covariance_type='full', n_init=3)
+    model = sklearn.mixture.GaussianMixture(n_components=audio_number + 1, covariance_type='full', n_init=1)
     model.fit(results)
 
     filename = './Trainer/model' + nomefile + ".gmm"
@@ -96,5 +96,8 @@ def remove_wav_files(nomefile, audio_number):
 voice_model('alessandro', 2)
 voice_model('amedeo',2)
 voice_model('colucci',2)
-#remove_wav_files('amedeo',2)
+voice_model('mamma',2)
+voice_model('papa',2)
+voice_model('pepe',2)
+#remove_wav_files('mamma',2)
 #remove_photo_user()

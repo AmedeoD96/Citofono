@@ -8,7 +8,6 @@ from sklearn import preprocessing
 import librosa
 import speaker_verification_toolkit.tools as svt
 
-"""
 # Variabili riconoscimento del volto
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read('Trainer/trainer.yml')
@@ -20,7 +19,7 @@ id = 0
 # Nome associato all'ID
 # TODO: DA MODIFICARE. NON DEVE ESSERE UNA LISTA STATICA
 names = ['Sconosciuto', 'Amedeo', 'Enzo']
-"""
+
 
 
 # Variabili riconoscimento voce
@@ -62,12 +61,12 @@ def readAllGMMs():
 
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
-    #print("con il valore di", (np.exp(log_likelihood[winner])/(1+np.exp(log_likelihood[winner]))))
-    print(log_likelihood)
+    print("con il valore di", ((log_likelihood[winner]-55)*100)/6 )
+    print(((log_likelihood-55)*100)/6)
 
 readAllGMMs()
 
-"""
+
 # Attivo la camera
 cam = cv2.VideoCapture(0)
 cam.set(3, 640)  #Larghezza
@@ -124,6 +123,5 @@ while True:
 print("\n Uscita in corso...")
 cam.release()
 cv2.destroyAllWindows()
-"""
 
 
