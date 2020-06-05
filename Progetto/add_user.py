@@ -45,7 +45,7 @@ def add_user():
     print("Parla")
     myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
     sd.wait()
-    write('./Registrazioni/input' + str(1000) + '.wav', fs, myrecording)
+    write('./Registrazioni/input' + str(face_id) + '.wav', fs, myrecording)
     print("Registrazione terminata con successo")
 
 init_camera()
