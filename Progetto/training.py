@@ -47,29 +47,27 @@ def face_model():
     print("\n [INFO] {0} Facce unoarate. Uscita in corso...".format(len(np.unique(ids))))
 
 def voice_model (nomefile, audio_number):
-
-    AUDIO_FILE = './Registrazioni/input1000.wav'
-
-    data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
-    data = svt.rms_silence_filter(data)
-    mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
-    mfcc = preprocessing.scale(mfcc)
-    delta = librosa.feature.delta(mfcc)
-    combined = numpy.hstack((mfcc, delta))
-
     results = numpy.asmatrix(())
-    for i in range(1, audio_number + 1):
-        mfcc = combined
-        i += 1
 
-        if i == 2:
+    for i in range(1, audio_number + 1):
+        AUDIO_FILE = './Registrazioni/' + nomefile + str(i) + '.wav'
+
+        data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
+        data = svt.rms_silence_filter(data)
+        mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
+        mfcc = preprocessing.scale(mfcc)
+        delta = librosa.feature.delta(mfcc)
+        combined = numpy.hstack((mfcc, delta))
+
+        mfcc = combined
+
+        if i == 1:
             results = mfcc
         else:
             results = numpy.vstack((results, mfcc))
 
     model = sklearn.mixture.GaussianMixture(n_components=audio_number + 1, covariance_type='diag', n_init=3)
     model.fit(results)
-    # Estimate model parameters with the EM algorithm. expectation maximization
 
     filename = './Trainer/model' + nomefile + ".gmm"
     pickle.dump(model, open(filename, 'wb'))
@@ -86,6 +84,15 @@ def remove_photo_user():
             break
     print("Rimozione effettuata con successo")
 
-face_model()
-voice_model('modello', 1)
-remove_photo_user()
+def remove_wav_files(nomefile, audio_number):
+    for i in range (1,audio_number+1):
+        if os.path.exists('./Registrazioni/' + nomefile + str(i) + '.wav'):
+            os.remove('./Registrazioni/' + nomefile + str(i) + '.wav')
+    print("rimozione file wav avvenuta")
+
+
+
+#face_model()
+voice_model('amedeo', 2)
+remove_wav_files('amedeo',2)
+#remove_photo_user()
