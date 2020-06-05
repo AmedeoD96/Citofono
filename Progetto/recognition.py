@@ -19,7 +19,7 @@ id = 0
 
 # Nome associato all'ID
 # TODO: DA MODIFICARE. NON DEVE ESSERE UNA LISTA STATICA
-names = ['Sconosciuto', 'Amedeo', 'Enzo']
+names = ['Sconosciuto', 'Amedeo', 'Enzo', 'Alessandro']
 
 
 
@@ -64,7 +64,10 @@ def readAllGMMs():
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
     confidenza_audio = (((log_likelihood[winner]-55)*100)/6)
-    print("con il valore di", confidenza_audio)
+    if(confidenza_audio > 100):
+        print("con il valore di 100%")
+    else:
+        print("con il valore di", confidenza_audio)
     print("tutti i valori sono:")
     print(((log_likelihood-55)*100)/6)
 
