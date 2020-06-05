@@ -32,9 +32,9 @@ def readAllGMMs():
     print("Avvio riconoscimento vocale: parla\n")
     myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
     sd.wait()
-    write('./Registrazioni/input' + str(1000) + '.wav', fs, myrecording)
+    write('Registrazioni/input' + str(1000) + '.wav', fs, myrecording)
 
-    data, sr = librosa.load('./Registrazioni/input' + str(1000) + '.wav', sr=16000, mono=True)
+    data, sr = librosa.load('Registrazioni/input' + str(1000) + '.wav', sr=16000, mono=True)
     data = svt.rms_silence_filter(data)
 
     mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
