@@ -74,5 +74,18 @@ def voice_model (nomefile, audio_number):
     filename = './Trainer/model' + nomefile + ".gmm"
     pickle.dump(model, open(filename, 'wb'))
 
+def remove_photo_user():
+    id = 1
+    while (True):
+        for x in range(1, 31):
+            if os.path.exists('./Dataset/User.' + str(id) + '.' + str(x) + '.jpg'):
+                os.remove('./Dataset/User.' + str(id) + '.' + str(x) + '.jpg')
+        if os.path.exists('./Dataset/User.' + str(id+1) + '.1.jpg'):
+            id += 1
+        else:
+            break
+    print("Rimozione effettuata con successo")
+
 face_model()
 voice_model('modello', 1)
+remove_photo_user()
