@@ -28,6 +28,7 @@ def face_model():
         img_numpy = np.array(PIL_img, 'uint8')
 
         id = int(os.path.split(imagePath)[-1].split(".")[1])
+        print(id)
         faces = detector.detectMultiScale(img_numpy)
 
         for (x,y,w,h) in faces:
@@ -72,8 +73,9 @@ def voice_model (nomefile, audio_number):
     filename = './Trainer/model' + nomefile + ".gmm"
     pickle.dump(model, open(filename, 'wb'))
 
+# TODO fare generico altrimenti lillo si arrabbia
 def remove_photo_user():
-    id = 1
+    id = 0
     while (True):
         for x in range(1, 31):
             if os.path.exists('./Dataset/User.' + str(id) + '.' + str(x) + '.jpg'):

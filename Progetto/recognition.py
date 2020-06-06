@@ -18,9 +18,8 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 id = 0
 
 # Nome associato all'ID
-# TODO: DA MODIFICARE. NON DEVE ESSERE UNA LISTA STATICA
-names = ['Sconosciuto', 'Amedeo', 'Enzo', 'Alessandro']
-
+with open("username.txt", "r") as f:
+    names = [line.strip() for line in f]
 
 
 

@@ -1,6 +1,8 @@
 import cv2
 from scipy.io.wavfile import write
 import sounddevice as sd
+import fileinput
+import user_list
 
 
 def init_camera():
@@ -9,13 +11,29 @@ def init_camera():
     cam.set(4, 480)
     return cam
 
+
+def get_count():
+    file = open("count.txt", "r")
+    count = file.readline().strip()
+    return count
+
+def update_counter_file():
+    count = get_count()
+    count = int(count)
+    count += 1
+    with fileinput.FileInput("count.txt", inplace=True, backup='.bak') as file:
+        line = file.readline().strip()
+        print(line.replace(line, str(count)), end='')
+
+
 def add_user():
     
     cam = init_camera()
     face_detector = cv2.CascadeClassifier('CascadeClassifier/haarcascade_frontalface_default.xml')
 
     # Per ogni persona, inserisco un id numerico
-    face_id = input('\n Inserisci id utente: ')
+    name = input("\n Inserisci il nome dell'utente: ")
+    user_list.nuovo_utente(name)
     print("\nInizializzazione. Attendere prego...")
 
     count = 0
@@ -28,7 +46,7 @@ def add_user():
             count += 1
 
             # Salvo l'immagine nella cartella dataset
-            cv2.imwrite("Dataset/User." + str(face_id) + '.' + str(count) + ".jpg", gray[y:y + h, x:x + w])
+            cv2.imwrite("Dataset/User." + str(get_count()) + '.' + str(count) + ".jpg", gray[y:y + h, x:x + w])
             cv2.imshow('image', img)
         k = cv2.waitKey(100) & 0xff  # ESC per uscire
         if k == 27:
@@ -45,7 +63,7 @@ def add_user():
     seconds = 5
 
     numero_wav = input('\n Inserisci il numero di audio che vuoi generare: ')
-    for i in range(0,int(numero_wav)):
+    for i in range(0, int(numero_wav)):
         print("immissione audio numero", str(i+1))
         print("Parla")
         myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
@@ -55,6 +73,4 @@ def add_user():
 
 init_camera()
 add_user()
-
-
-
+update_counter_file()
