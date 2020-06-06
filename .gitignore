@@ -140,3 +140,4 @@ dmypy.json
 secret.py
 .idea/
 .DS_Store
+.wav
