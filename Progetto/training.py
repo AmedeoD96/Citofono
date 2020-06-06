@@ -8,6 +8,7 @@ import librosa
 import sklearn.mixture
 import numpy
 import pickle
+import onesignal
 
 # Acquisizione di immagini e labels
 def face_model():
@@ -93,8 +94,22 @@ def remove_wav_files(nomefile, audio_number):
     print("rimozione file wav avvenuta")
 
 
+def send_notification():
+    onesignal_client = onesignal.Client(app_auth_key="N2E4NTNkNzAtYjhjYi00ZTI0LWIzZWUtYTM1YmIyMmQxNzE4",
+                                        app_id="1784a5bd-7107-4bda-b628-a19c2034159e")
+    new_notification = onesignal.Notification(post_body={"contents": {"en": "Modello creato"}})
+    new_notification.post_body["included_segments"] = ["Active Users"]
+    new_notification.post_body["buttons"] = [{"id": "id1", "text": "Apri la porta", "icon": "ic_menu_share"},
+                                             {"id": "id2", "text": "Chiama la pula", "icon": "ic_menu_share"}]
 
-face_model()
+    onesignal_response = onesignal_client.send_notification(new_notification)
+
+    print(onesignal_response.status_code)
+    print(onesignal_response.json())
+
+
+
+#face_model()
 #voice_model('alessandro', 2)
 #voice_model('amedeo',2)
 #voice_model('colucci',2)
@@ -102,4 +117,5 @@ face_model()
 #voice_model('papa',2)
 #voice_model('pepe',2)
 #remove_wav_files('mamma',2)
-remove_photo_user()
+#remove_photo_user()
+send_notification()
