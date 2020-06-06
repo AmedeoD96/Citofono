@@ -14,7 +14,7 @@ public class SendMessage extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... strings) {
         try {
             try {
-                Socket socket = new Socket("192.168.1.13", 8888);
+                Socket socket = new Socket("192.168.1.50", 8888);
                 PrintWriter outToServer = new PrintWriter(
                         new OutputStreamWriter(
                                 socket.getOutputStream()));

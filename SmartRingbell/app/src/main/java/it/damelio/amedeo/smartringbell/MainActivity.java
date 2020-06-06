@@ -32,11 +32,12 @@ public class MainActivity extends AppCompatActivity {
 
         initUI();
 
-        risposta = notificationOpenHandler.getRisposta();
+        //risposta = notificationOpenHandler.getRisposta();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                risposta = notificationOpenHandler.getRisposta();
                 if (!risposta.equals("")) {
                     new SendMessage().execute(risposta);
                     editText.getText().clear();
