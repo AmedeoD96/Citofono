@@ -17,6 +17,7 @@ def get_count():
     count = file.readline().strip()
     return count
 
+
 def update_counter_file():
     count = get_count()
     count = int(count)
@@ -27,7 +28,6 @@ def update_counter_file():
 
 
 def add_user():
-    
     cam = init_camera()
     face_detector = cv2.CascadeClassifier('CascadeClassifier/haarcascade_frontalface_default.xml')
 
@@ -57,19 +57,19 @@ def add_user():
     cam.release()
     cv2.destroyAllWindows()
 
-
     #  Acquisizione Audio utente
     fs = 44100
     seconds = 5
 
     numero_wav = input('\n Inserisci il numero di audio che vuoi generare: ')
     for i in range(0, int(numero_wav)):
-        print("immissione audio numero", str(i+1))
+        print("immissione audio numero", str(i + 1))
         print("Parla")
         myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
         sd.wait()
-        write('./Registrazioni/input' + str(i+1) + '.wav', fs, myrecording)
+        write('./Registrazioni/input' + str(i + 1) + '.wav', fs, myrecording)
     print("Registrazione terminata con successo")
+
 
 init_camera()
 add_user()

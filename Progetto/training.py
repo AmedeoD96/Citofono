@@ -22,6 +22,7 @@ def face_model():
     imagePaths = [os.path.join(path, f) for f in os.listdir(path)]
     faceSamples=[]
     ids = []
+    print(*imagePaths)
 
     for imagePath in imagePaths:
 
@@ -121,9 +122,9 @@ def send_notification():
 
 
 
-#face_model()
+face_model()
 #voice_model('alessandro', 2)
-#voice_model('amedeo',2)
+voice_model('input',2)
 #remove_wav_files('alessandro',2)
 #remove_photo_user()
-#send_notification()
+send_notification()

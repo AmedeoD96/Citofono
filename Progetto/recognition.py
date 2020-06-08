@@ -8,7 +8,6 @@ from sklearn import preprocessing
 import librosa
 import speaker_verification_toolkit.tools as svt
 
-
 # Variabili riconoscimento del volto
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read('Trainer/trainer.yml')
@@ -21,11 +20,12 @@ id = 0
 with open("username.txt", "r") as f:
     names = [line.strip() for line in f]
 
-
+print(*names)
 
 # Variabili riconoscimento voce
-models  = []
-speakers  = []
+models = []
+speakers = []
+
 
 def readAllGMMs():
     fs = 44100
@@ -47,41 +47,41 @@ def readAllGMMs():
     for entry in os.listdir(basepath):
         if os.path.isfile(os.path.join(basepath, entry)):
             if entry.endswith(".gmm"):
-                #modelpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./models/" + entry)
-                gmmReaded = pickle.load(open(basepath + "/" +entry, 'rb'))
+                # modelpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./models/" + entry)
+                gmm_readed = pickle.load(open(basepath + "/" + entry, 'rb'))
                 speakers.append(entry)
-                models.append(gmmReaded)
+                models.append(gmm_readed)
 
     log_likelihood = np.zeros(len(models))
 
     for i in range(len(models)):
         gmm = models[i]
         scores = np.array(gmm.score(combined))
-        #Calcola la probabilità log pesata per campione del parametro.
-        #ritorna Log likelihood del Gaussian mixture dato il parametro combined.
+        # Calcola la probabilità log pesata per campione del parametro.
+        # ritorna Log likelihood del Gaussian mixture dato il parametro combined.
         log_likelihood[i] = scores.sum()
         # Compute the media per campione in scala log-likelihood del dato ottenuto
 
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
-    confidenza_audio = (((log_likelihood[winner]-55)*100)/6)
-    if(confidenza_audio > 100):
+    confidenza_audio = (((log_likelihood[winner] - 55) * 100) / 6)
+    if (confidenza_audio > 100):
         print("con il valore di 100%")
     else:
         print("con il valore di", confidenza_audio)
     print("tutti i valori sono:")
-    print(((log_likelihood-55)*100)/6)
+    print(((log_likelihood - 55) * 100) / 6)
+
 
 readAllGMMs()
 
-
 # Attivo la camera
 cam = cv2.VideoCapture(0)
-cam.set(3, 640)  #Larghezza
-cam.set(4, 480)  #Altezza
+cam.set(3, 640)  # Larghezza
+cam.set(4, 480)  # Altezza
 
-minW = 0.1*cam.get(3)
-minH = 0.1*cam.get(4)
+minW = 0.1 * cam.get(3)
+minH = 0.1 * cam.get(4)
 
 while True:
     ret, img = cam.read()
@@ -93,14 +93,14 @@ while True:
         minNeighbors=8,
         minSize=(int(minW), int(minH))
     )
-    for(x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        id, confidence = recognizer.predict(gray[y:y+h, x:x+w])
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
         # Se la confidenza è meno di 100 allora è perfetta
-        if(confidence < 100):
+        if (confidence < 100):
             id = names[id]
-            confidence = "{0}%".format(round(100-confidence))
+            confidence = "{0}%".format(round(100 - confidence))
         else:
             id = "Sconosciuto"
             confidence = "{0}%".format(round(100 - confidence))
@@ -108,7 +108,7 @@ while True:
         cv2.putText(
             img,
             str(id),
-            (x+5, y-5),
+            (x + 5, y - 5),
             font,
             1,
             (255, 255, 255),
@@ -117,7 +117,7 @@ while True:
         cv2.putText(
             img,
             str(confidence),
-            (x+5, y+h+5),
+            (x + 5, y + h + 5),
             font,
             1,
             (255, 255, 0),
@@ -131,6 +131,3 @@ while True:
 print("\n Uscita in corso...")
 cam.release()
 cv2.destroyAllWindows()
-
-
-
