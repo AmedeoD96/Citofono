@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 risposta = notificationOpenHandler.getRisposta();
-                if (!risposta.equals("")) {
+                if (risposta != null && !risposta.equals("")) {
                     new SendMessage().execute(risposta);
                     editText.getText().clear();
                 }else {
