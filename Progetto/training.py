@@ -55,9 +55,16 @@ def voice_model (nomefile, audio_number):
         AUDIO_FILE = './Registrazioni/' + nomefile + str(i) + '.wav'
 
         data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
+        #converte l'audio in un vettore di floating point
+        #data è il vero e proprio vettore di tipo float32
+        #sr è un numero >0 che indica il tasso di campionamento
         data = svt.rms_silence_filter(data)
         mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
         mfcc = preprocessing.scale(mfcc)
+        #Standardizza un dataset su qualunque asse
+        #Standardizzazione di datasets è un requisito comunine per molti stimatori in ambito machine-learning
+        #implementati in scikit-learn; potrebbero comportarsi in maniera inaspettata se le features individuali
+        #non sono standardizzate normalmente con dati distribuiti
         delta = librosa.feature.delta(mfcc)
         combined = numpy.hstack((mfcc, delta))
 
@@ -69,7 +76,12 @@ def voice_model (nomefile, audio_number):
             results = numpy.vstack((results, mfcc))
 
     model = sklearn.mixture.GaussianMixture(n_components=audio_number + 1, covariance_type='full', n_init=1)
+    #classe che permette di stimare i parametri di una gaussian mixture model
     model.fit(results)
+    #stima i parametri del modello con l'algoritmo EM
+    #expectation maximization: Lo scopo dell’algoritmo EM è quello di aumentare, e possibilmente di massimizzare,
+    #la likelihood dei parametri di un modello probabilistico M rispetto ad un insieme di dati s,
+    #risultati di un processo stocastico che coinvolge un processo non noto
 
     filename = './Trainer/model' + nomefile + ".gmm"
     pickle.dump(model, open(filename, 'wb'))
@@ -112,11 +124,6 @@ def send_notification():
 #face_model()
 #voice_model('alessandro', 2)
 #voice_model('amedeo',2)
-#voice_model('colucci',2)
-#voice_model('lenoci',3)
-#voice_model('mamma',2)
-#voice_model('papa',2)
-#voice_model('pepe',2)
-#remove_wav_files('mamma',2)
+#remove_wav_files('alessandro',2)
 #remove_photo_user()
 #send_notification()

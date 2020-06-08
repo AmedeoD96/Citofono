@@ -57,8 +57,10 @@ def readAllGMMs():
     for i in range(len(models)):
         gmm = models[i]
         scores = np.array(gmm.score(combined))
+        #Calcola la probabilità log pesata per campione del parametro.
+        #ritorna Log likelihood del Gaussian mixture dato il parametro combined.
         log_likelihood[i] = scores.sum()
-        # Compute the per-sample average log-likelihood of the given data
+        # Compute the media per campione in scala log-likelihood del dato ottenuto
 
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
