@@ -62,9 +62,9 @@ def voice_model (nomefile, audio_number):
         mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
         mfcc = preprocessing.scale(mfcc)
         #Standardizza un dataset su qualunque asse
-        #Standardizzazione di datasets è un requisito comunine per molti stimatori in ambito machine-learning
+        #Standardizzazione di datasets è un requisito comune per molti stimatori in ambito machine-learning
         #implementati in scikit-learn; potrebbero comportarsi in maniera inaspettata se le features individuali
-        #non sono standardizzate normalmente con dati distribuiti
+        #non fossero standardizzate normalmente con dati distribuiti
         delta = librosa.feature.delta(mfcc)
         combined = numpy.hstack((mfcc, delta))
 
@@ -86,7 +86,7 @@ def voice_model (nomefile, audio_number):
     filename = './Trainer/model' + nomefile + ".gmm"
     pickle.dump(model, open(filename, 'wb'))
 
-# TODO fare generico altrimenti lillo si arrabbia
+# TODO fare generico
 def remove_photo_user():
     id = 0
     while (True):
