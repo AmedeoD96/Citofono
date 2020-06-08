@@ -113,7 +113,7 @@ def send_notification():
     new_notification = onesignal.Notification(post_body={"contents": {"en": "Modello creato"}})
     new_notification.post_body["included_segments"] = ["Active Users"]
     new_notification.post_body["buttons"] = [{"id": "id1", "text": "Apri la porta", "icon": "ic_menu_share"},
-                                             {"id": "id2", "text": "Chiama la pula", "icon": "ic_menu_share"}]
+                                             {"id": "id2", "text": "La porta resta chiusa", "icon": "ic_menu_share"}]
 
     onesignal_response = onesignal_client.send_notification(new_notification)
 
@@ -123,8 +123,7 @@ def send_notification():
 
 
 face_model()
-#voice_model('alessandro', 2)
 voice_model('input',2)
-#remove_wav_files('alessandro',2)
-#remove_photo_user()
+remove_wav_files('input',2)
+remove_photo_user()
 send_notification()
