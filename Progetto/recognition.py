@@ -7,6 +7,10 @@ import pickle
 from sklearn import preprocessing
 import librosa
 import speaker_verification_toolkit.tools as svt
+from sklearn.preprocessing import minmax_scale
+from sklearn.preprocessing import scale
+from sklearn.preprocessing import maxabs_scale
+from sklearn.preprocessing import robust_scale
 
 # Variabili riconoscimento del volto
 recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -64,7 +68,15 @@ def readAllGMMs():
 
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
-    confidenza_audio = (((log_likelihood[winner] - 55) * 100) / 6)
+    #scaler = MinMaxScaler()
+    #scaler.fit(np.asmatrix(log_likelihood))
+    #print(scaler.transform(np.asmatrix(log_likelihood)))
+    print("minmax")
+    print(minmax_scale(log_likelihood))
+    print("scale")
+    print(scale(log_likelihood))
+
+    confidenza_audio =  (((log_likelihood[winner] - 55) * 100) / 6)
     if (confidenza_audio > 100):
         print("con il valore di 100%")
     else:

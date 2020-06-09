@@ -122,8 +122,11 @@ def send_notification():
 
 
 
-face_model()
-voice_model('input',2)
-remove_wav_files('input',2)
-remove_photo_user()
-send_notification()
+#face_model()
+#voice_model('mamma',2)
+#voice_model('papa',2)
+#voice_model('colucci',2)
+#voice_model('pepe',2)
+#remove_wav_files('mamma',2)
+#remove_photo_user()
+#send_notification()
