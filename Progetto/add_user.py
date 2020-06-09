@@ -4,6 +4,7 @@ import sounddevice as sd
 import fileinput
 import user_list
 from cv2 import *
+import time
 
 
 def init_camera():
@@ -29,6 +30,7 @@ def update_counter_file():
 
 
 def add_user():
+    print("\nAvvio della fase di raccolta dati\n")
     cam = init_camera()
     face_detector = cv2.CascadeClassifier('CascadeClassifier/haarcascade_frontalface_default.xml')
 
@@ -38,9 +40,9 @@ def add_user():
     print("\nInizializzazione. Attendere prego...")
 
     count = 0
-    while (True):
+    while True:
         ret, img = cam.read()
-        if (ret):
+        if ret:
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             faces = face_detector.detectMultiScale(gray, 1.2, 8)
             for (x, y, w, h) in faces:
@@ -63,14 +65,31 @@ def add_user():
     fs = 44100
     seconds = 5
 
-    numero_wav = input('\n Inserisci il numero di audio che vuoi generare: ')
-    for i in range(0, int(numero_wav)):
-        print("immissione audio numero", str(i + 1))
-        print("Parla")
-        myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
-        sd.wait()
-        write('./Registrazioni/input' + str(i + 1) + '.wav', fs, myrecording)
-    print("Registrazione terminata con successo")
+    numero_wav = 3
+    audio = 0
+
+    print("Acquisizione volto completata.\nAvvio acquisizione audio\n")
+
+    while audio < numero_wav:
+        for i in range(0, int(numero_wav)):
+            print("Immissione audio numero", str(i + 1))
+            for j in range(3, 0, -1):
+                print(f"La registrazione inizia tra {j}")
+                time.sleep(1)
+            print("Parla")
+            myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
+            sd.wait()
+            write('./Registrazioni/input' + str(i + 1) + '.wav', fs, myrecording)
+        print("Registrazione terminata con successo")
+        if audio == numero_wav:
+            confirm = input('\nSe vuoi, puoi registare altri file audio per migliorare il riconoscimento.'
+                            '\nPremi y se vuoi registrare altri file audio.'
+                            '\nPremi n se non vuoi registrare altri file.')
+            if confirm == 'y':
+                numero_wav = input('\n Inserisci il numero di audio che vuoi generare: ')
+                audio = 0
+        audio += 1
+    print("\nFase di raccolta dati terminata\n")
 
 
 init_camera()
