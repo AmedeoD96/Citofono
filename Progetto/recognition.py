@@ -68,15 +68,15 @@ def readAllGMMs():
 
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
-    #scaler = MinMaxScaler()
-    #scaler.fit(np.asmatrix(log_likelihood))
-    #print(scaler.transform(np.asmatrix(log_likelihood)))
+    # scaler = MinMaxScaler()
+    # scaler.fit(np.asmatrix(log_likelihood))
+    # print(scaler.transform(np.asmatrix(log_likelihood)))
     print("minmax")
     print(minmax_scale(log_likelihood))
     print("scale")
     print(scale(log_likelihood))
 
-    confidenza_audio =  (((log_likelihood[winner] - 55) * 100) / 6)
+    confidenza_audio = (((log_likelihood[winner] - 55) * 100) / 6)
     if (confidenza_audio > 100):
         print("con il valore di 100%")
     else:
@@ -110,7 +110,7 @@ while True:
         id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
         # Se la confidenza è meno di 100 allora è perfetta
-        if (confidence < 100):
+        if confidence < 100:
             id = names[id]
             confidence = "{0}%".format(round(100 - confidence))
         else:

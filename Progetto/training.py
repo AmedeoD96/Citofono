@@ -41,11 +41,15 @@ def face_model():
     print("\n Fase di addestramento. Attendere...")
     recognizer.train(faceSamples, np.array(ids))
 
+    # Get username
+    with open("username.txt", "r") as f:
+        lines = f.read().splitlines()
+        last_line = lines[-1]
     # Salvo il modello
     recognizer.write('./Trainer/trainer.yml')
 
     # Stampo il numero di facce imparate
-    print("\n [INFO] {0} Facce unoarate. Uscita in corso...".format(len(np.unique(ids))))
+    print("\n [INFO] {0} Facce imparate. Uscita in corso...".format(len(np.unique(ids))))
 
 def voice_model (nomefile, audio_number):
     results = numpy.asmatrix(())
@@ -117,11 +121,11 @@ def send_notification():
 
 
 
-#face_model()
+face_model()
 #voice_model('mamma',2)
 #voice_model('papa',2)
 #voice_model('colucci',2)
 #voice_model('pepe',2)
 #remove_wav_files('mamma',2)
-#remove_photo_user()
+remove_photo_user()
 #send_notification()

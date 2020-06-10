@@ -65,30 +65,35 @@ def add_user():
     fs = 44100
     seconds = 5
 
-    numero_wav = 3
-    audio = 0
+
 
     print("Acquisizione volto completata.\nAvvio acquisizione audio\n")
 
+    numero_wav = 3
+    audio = 0
+    i = 0
     while audio < numero_wav:
-        for i in range(0, int(numero_wav)):
-            print("Immissione audio numero", str(i + 1))
-            for j in range(3, 0, -1):
-                print(f"La registrazione inizia tra {j}")
-                time.sleep(1)
-            print("Parla")
-            myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
-            sd.wait()
-            write('./Registrazioni/input' + str(i + 1) + '.wav', fs, myrecording)
+        print("Immissione audio numero", str(i + 1))
+        for j in range(3, 0, -1):
+            print(f"La registrazione inizia tra {j}")
+            time.sleep(1)
+        print("Parla")
+        myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
+        sd.wait()
+        write('./Registrazioni/input' + str(i + 1) + '.wav', fs, myrecording)
         print("Registrazione terminata con successo")
+        audio += 1
+        i += 1
         if audio == numero_wav:
             confirm = input('\nSe vuoi, puoi registare altri file audio per migliorare il riconoscimento.'
                             '\nPremi y se vuoi registrare altri file audio.'
                             '\nPremi n se non vuoi registrare altri file.')
+            print(confirm)
             if confirm == 'y':
-                numero_wav = input('\n Inserisci il numero di audio che vuoi generare: ')
+                numero_wav = int(input('\n Inserisci il numero di audio che vuoi generare: '))
                 audio = 0
-        audio += 1
+
+        print(audio)
     print("\nFase di raccolta dati terminata\n")
 
 
