@@ -15,14 +15,14 @@ class SampleApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (MainMenu, PageAdd, PageRemove):
+        for F in (MainMenu, PageAdd, PageRemove, PageModify, PageTest):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("StartPage")
+        self.show_frame("MainMenu")
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
@@ -101,6 +101,6 @@ class PageTest(tk.Frame):
         button.pack()
 
 
-if __name__ == "SampleApp":
+if __name__ == "__main__":
     app = SampleApp()
     app.mainloop()
