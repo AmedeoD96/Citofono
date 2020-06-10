@@ -9,6 +9,7 @@ import sklearn.mixture
 import numpy
 import pickle
 import onesignal
+import glob
 
 # Acquisizione di immagini e labels
 def face_model():
@@ -37,11 +38,8 @@ def face_model():
             faceSamples.append(img_numpy[y:y+h, x:x+w])
             ids.append(id)
 
-
     print("\n Fase di addestramento. Attendere...")
     recognizer.train(faceSamples, np.array(ids))
-
-
 
     # Salvo il modello
     recognizer.write('./Trainer/trainer.yml')
@@ -87,18 +85,15 @@ def voice_model (nomefile, audio_number):
     filename = './Trainer/model' + nomefile + ".gmm"
     pickle.dump(model, open(filename, 'wb'))
 
-# TODO fare generico
 def remove_photo_user():
-    id = 0
-    while (True):
-        for x in range(1, 31):
-            if os.path.exists('./Dataset/User.' + str(id) + '.' + str(x) + '.jpg'):
-                os.remove('./Dataset/User.' + str(id) + '.' + str(x) + '.jpg')
-        if os.path.exists('./Dataset/User.' + str(id+1) + '.1.jpg'):
-            id += 1
-        else:
-            break
-    print("Rimozione effettuata con successo")
+    path = 'Dataset'
+    photos = glob.glob(path + '/*')
+    for f in photos:
+        os.remove(f)
+    if len(os.listdir(path)) == 0:
+        print("Rimozione effettuata con successo\n")
+    else:
+        print("Impossibile eliminare tutti i file\n")
 
 def remove_wav_files(nomefile, audio_number):
     for i in range (1,audio_number+1):
