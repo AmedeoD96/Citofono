@@ -92,8 +92,6 @@ def add_user():
             if confirm == 'y':
                 numero_wav = int(input('\n Inserisci il numero di audio che vuoi generare: '))
                 audio = 0
-
-        print(audio)
     print("\nFase di raccolta dati terminata\n")
 
 
