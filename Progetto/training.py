@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from PIL import Image
 import os
 import speaker_verification_toolkit.tools as svt
 from sklearn import preprocessing

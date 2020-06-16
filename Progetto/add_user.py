@@ -2,7 +2,6 @@ import cv2
 from scipy.io.wavfile import write
 import sounddevice as sd
 import fileinput
-import user_list
 from cv2 import *
 import time
 import os
