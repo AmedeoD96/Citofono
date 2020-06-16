@@ -17,7 +17,7 @@ from face_trainer import *
 # Variabili riconoscimento voce
 models = []
 speakers = []
-
+find = False
 
 def read_all_gmms():
     fs = 44100
@@ -54,6 +54,7 @@ def read_all_gmms():
         log_likelihood[i] = scores.sum()
         # Compute the media per campione in scala log-likelihood del dato ottenuto
 
+    print(f"Log likelihood: {log_likelihood}")
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
     # scaler = MinMaxScaler()
@@ -62,7 +63,15 @@ def read_all_gmms():
     print("minmax")
     print(minmax_scale(log_likelihood))
     print("scale")
-    print(scale(log_likelihood))
+    trovato = scale(log_likelihood)
+    if trovato[winner] >= 1:
+        print("Trovato\n")
+        print(scale(log_likelihood))
+        print(speakers[winner])
+        find = True
+    else:
+        print("Non trovato\n")
+
 
     confidenza_audio = (((log_likelihood[winner] - 55) * 100) / 6)
     if (confidenza_audio > 100):
@@ -71,6 +80,7 @@ def read_all_gmms():
         print("con il valore di", confidenza_audio)
     print("tutti i valori sono:")
     print(((log_likelihood - 55) * 100) / 6)
+    return find
 
 
 def face_recognize():
@@ -123,7 +133,7 @@ def face_recognize():
                         min_dist = dist
                         name = names
             # Se la distanza minima è minore del threshold allora posso aprire la porta
-            if min_dist <= 0.4:
+            if min_dist <= 0.4 and find:
                 print("Porta sbloccata: bentornato " + str(name))
                 break
 
