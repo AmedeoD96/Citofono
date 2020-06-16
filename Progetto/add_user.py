@@ -5,6 +5,9 @@ import fileinput
 import user_list
 from cv2 import *
 import time
+import os
+import pickle
+from face_trainer import *
 
 
 def init_camera():
@@ -14,58 +17,92 @@ def init_camera():
     return cam
 
 
-def get_count():
-    file = open("count.txt", "r")
-    count = file.readline().strip()
-    return count
-
-
-def update_counter_file():
-    count = get_count()
-    count = int(count)
-    count += 1
-    with fileinput.FileInput("count.txt", inplace=True, backup='.bak') as file:
-        line = file.readline().strip()
-        print(line.replace(line, str(count)), end='')
-
-
 def add_user():
     print("\nAvvio della fase di raccolta dati\n")
     cam = init_camera()
     face_detector = cv2.CascadeClassifier('CascadeClassifier/haarcascade_frontalface_default.xml')
 
-    # Per ogni persona, inserisco un id numerico
+    db_path = "./Dataset/embeddings.pickle"
     name = input("\n Inserisci il nome dell'utente: ")
-    user_list.nuovo_utente(name)
+
+    # Se il database non esiste, lo creo
+    if os.path.exists(db_path):
+        with open(db_path, 'rb') as database:
+            db = pickle.load(database)
+
+            if name in db or name == "Sconosciuto":
+                print("Nome già presente nel db. Prova con un altro nome.\n")
+                return
+    else:
+        # Se il db non esiste, ne creo uno nuovo
+        db = {}
+
     print("\nInizializzazione. Attendere prego...")
+    i = 3
+    face_found = False
 
-    count = 0
     while True:
-        ret, img = cam.read()
-        if ret:
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            faces = face_detector.detectMultiScale(gray, 1.2, 8)
-            for (x, y, w, h) in faces:
-                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                count += 1
+        _, frame = cam.read()
+        cv2.putText(frame, 'Inquadra il tuo volto', (100, 200), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8, (255, 255, 255), 2)
 
-            # Salvo l'immagine nella cartella dataset
-                cv2.imwrite("Dataset/User." + str(get_count()) + '.' + str(count) + ".jpg", gray[y:y + h, x:x + w])
-                cv2.imshow('image', img)
-            k = cv2.waitKey(100) & 0xff  # ESC per uscire
-            if k == 27:
-                break
-            elif count >= 30:  # Prendo 30 foto come esempio e poi stoppo il video
-                break
+        cv2.putText(frame, 'Avvio', (260, 270), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8, (255, 255, 255), 2)
+
+        cv2.putText(frame, str(i), (290, 330), cv2.FONT_HERSHEY_SIMPLEX,
+                    1.3, (255, 255, 255), 3)
+
+        i -= 1
+        cv2.imshow('frame', frame)
+        cv2.waitKey(1000)
+        if i < 0:
+            break
+
+    start_time = time.time()
+
+    # Face recognition
+    while True:
+        curr_time = time.time()
+        _, frame = cam.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        face = face_detector.detectMultiScale(gray, 1.05, 8)
+        if len(face) == 1:
+            for (x, y, w, h) in face:
+                # Considero solo il roi (Region Of Interest) dell'immagine
+                roi = frame[y - 10:y + h + 10, x - 10:x + w + 10]
+                fh, fw = roi.shape[:2]
+
+                # Verifico che il volto trovato sia della grandezza minima richiesta
+                if fh < 20 and fw < 20:
+                    continue
+
+                face_found = True
+                cv2.rectangle(frame, (x - 10, y - 10), (x + w + 10, y + h + 10), (255, 200, 200), 2)
+
+        if curr_time - start_time >= 5:
+            break
+
+        cv2.imshow('frame', frame)
+        cv2.waitKey(1)
 
     cam.release()
     cv2.destroyAllWindows()
 
-    #  Acquisizione Audio utente
+    if face_found:
+        img = cv2.resize(roi, (96, 96))
+        db[name] = img_to_encoding(img)
+        with open(db_path, "wb") as database:
+            pickle.dump(db, database, protocol=pickle.HIGHEST_PROTOCOL)
+    elif len(face) > 1:
+        print("Sono state identificati più volti. Riprova\n")
+        return
+    else:
+        print("Nessun volto trovato. Riprova\n")
+        return
+
+    # Acquisizione Audio utente
     fs = 44100
     seconds = 5
-
-
 
     print("Acquisizione volto completata.\nAvvio acquisizione audio\n")
 
@@ -97,4 +134,3 @@ def add_user():
 
 init_camera()
 add_user()
-update_counter_file()

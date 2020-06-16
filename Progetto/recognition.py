@@ -11,27 +11,15 @@ from sklearn.preprocessing import minmax_scale
 from sklearn.preprocessing import scale
 from sklearn.preprocessing import maxabs_scale
 from sklearn.preprocessing import robust_scale
-
-# Variabili riconoscimento del volto
-recognizer = cv2.face.LBPHFaceRecognizer_create()
-recognizer.read('Trainer/trainer.yml')
-cascadePath = "CascadeClassifier/haarcascade_frontalface_default.xml"
-faceCascade = cv2.CascadeClassifier(cascadePath)
-font = cv2.FONT_HERSHEY_SIMPLEX
-id = 0
-
-# Nome associato all'ID
-with open("username.txt", "r") as f:
-    names = [line.strip() for line in f]
-
-print(*names)
+import time
+from face_trainer import *
 
 # Variabili riconoscimento voce
 models = []
 speakers = []
 
 
-def readAllGMMs():
+def read_all_gmms():
     fs = 44100
     seconds = 5
     print("Avvio riconoscimento vocale: parla\n")
@@ -85,61 +73,77 @@ def readAllGMMs():
     print(((log_likelihood - 55) * 100) / 6)
 
 
-readAllGMMs()
+def face_recognize():
+    print("Inquadra il tuo volto\n")
+    cap = cv2.VideoCapture(0)
+    cap.set(3, 640)
+    cap.set(4, 480)
 
-# Attivo la camera
-cam = cv2.VideoCapture(0)
-cam.set(3, 640)  # Larghezza
-cam.set(4, 480)  # Altezza
+    cascade = cv2.CascadeClassifier('./CascadeClassifier/haarcascade_frontalface_default.xml')
 
-minW = 0.1 * cam.get(3)
-minH = 0.1 * cam.get(4)
+    # Carico il database
+    db_path = "./Dataset/embeddings.pickle"
+    database = pickle.load(open(db_path, "rb"))
 
-while True:
-    ret, img = cam.read()
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    time.sleep(1.0)
 
-    faces = faceCascade.detectMultiScale(
-        gray,
-        scaleFactor=1.2,
-        minNeighbors=8,
-        minSize=(int(minW), int(minH))
-    )
-    for (x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
+    start_time = time.time()
 
-        # Se la confidenza è meno di 100 allora è perfetta
-        if confidence < 100:
-            id = names[id]
-            confidence = "{0}%".format(round(100 - confidence))
-        else:
-            id = "Sconosciuto"
-            confidence = "{0}%".format(round(100 - confidence))
+    while True:
+        curr_time = time.time()
 
-        cv2.putText(
-            img,
-            str(id),
-            (x + 5, y - 5),
-            font,
-            1,
-            (255, 255, 255),
-            2
-        )
-        cv2.putText(
-            img,
-            str(confidence),
-            (x + 5, y + h + 5),
-            font,
-            1,
-            (255, 255, 0),
-            1
-        )
-    cv2.imshow('camera', img)
-    k = cv2.waitKey(10) & 0xff  # Premi ESC per uscire
-    if k == 27:
-        break
+        _, frame = cap.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-print("\n Uscita in corso...")
-cam.release()
-cv2.destroyAllWindows()
+        face = cascade.detectMultiScale(gray, 1.05, 8)
+        name = "Sconosciuto"
+
+        if len(face) == 1:
+            for (x, y, w, h) in face:
+                roi = frame[y - 10:y + h + 10, x - 10:x + w + 10]
+
+                fh, fw = roi.shape[:2]
+                min_dist = 100
+
+                # Verifico che il volto trovato sia delle dimensioni richieste
+                if fh < 20 and fw < 20:
+                    continue
+
+                # Resize dell'immagine come rieschisto dal modello
+                img = cv2.resize(roi, (96, 96))
+
+                encoding = img_to_encoding(img)
+
+                # Cerco il modello creato nel database
+                for names in database:
+                    # Cerco somiglianze usando la norma L2
+                    dist = np.linalg.norm(np.subtract(database[names], encoding))
+                    # Controllo se è la minima distanza
+                    if dist < min_dist:
+                        min_dist = dist
+                        name = names
+            # Se la distanza minima è minore del threshold allora posso aprire la porta
+            if min_dist <= 0.4:
+                print("Porta sbloccata: bentornato " + str(name))
+                break
+
+        # Attivo la webcam per 5 secondi
+        if curr_time - start_time > 5:
+            break
+
+        cv2.waitKey(1)
+        cv2.imshow("frame", frame)
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+    if len(face) == 0:
+        print("Nessun volto trovato. Riprova\n")
+    elif len(face) > 1:
+        print("Sono stati identificati più volti. Riprova\n")
+    elif min_dist > 0.4:
+        print("Volto non riconosciuto. Riprova\n")
+
+
+read_all_gmms()
+face_recognize()
