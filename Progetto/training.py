@@ -9,6 +9,8 @@ import numpy
 import pickle
 import onesignal
 import glob
+import scipy.signal as sg
+import wave
 
 
 def voice_model(nomefile, audio_number):
@@ -22,6 +24,15 @@ def voice_model(nomefile, audio_number):
         # data è il vero e proprio vettore di tipo float32
         # sr è un numero >0 che indica il tasso di campionamento
         data = svt.rms_silence_filter(data)
+
+        #fr = 44100*16*2
+        #b, a = sg.butter(4, 500. / (fr / 2.), 'low')
+        #data = sg.filtfilt(b, a, data)
+        fs = 44100.0
+        lowcut = 500.0
+        highcut = 1250.0
+        data = butter_bandpass_filter(data, lowcut, highcut, fs, order=6)
+
         mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
         mfcc = preprocessing.scale(mfcc)
         # Standardizza un dataset su qualunque asse
@@ -56,6 +67,26 @@ def remove_wav_files(nomefile, audio_number):
             os.remove('./Registrazioni/' + nomefile + str(i) + '.wav')
     print("rimozione file wav avvenuta")
 
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = sg.butter(order, [low, high], btype='band')
+    return b, a
 
-voice_model('input',3)
-remove_wav_files('input', 3)
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = sg.lfilter(b, a, data)
+    return y
+
+
+#voice_model('input',3)
+#remove_wav_files('input', 3)
+
+voice_model('alessandro',3)
+voice_model('amedeo',2)
+voice_model('colucci',2)
+voice_model('lenoci',3)
+voice_model('mamma',2)
+voice_model('papa',2)
+voice_model('pepe',2)

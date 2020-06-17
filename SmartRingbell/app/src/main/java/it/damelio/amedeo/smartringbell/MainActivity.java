@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private TextView textView;
 
-    final String imgURL = "http://192.168.1.13:5000/get-image/Dataset/sconosciuto.jpg";
+    final String imgURL = "http://192.168.1.20:5000/get-image/Dataset/sconosciuto.jpg";
 
 
     @Override

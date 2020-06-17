@@ -9,6 +9,7 @@ import pickle
 from face_trainer import *
 import noisereduce as nr
 from scipy.io import wavfile
+import librosa
 
 
 def init_camera():
@@ -119,10 +120,6 @@ def add_user():
         myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
         sd.wait()
         write('./Registrazioni/input' + str(i + 1) + '.wav', fs, myrecording)
-        #rate, data = wavfile.read("./Registrazioni/input"+str(i+1)+'.wav')
-        #noisy_part = data[10000:15000]
-        #reduced_noise = nr.reduce_noise(audio_clip=data, noise_clip=noisy_part, verbose=True)
-        #write('/Registrazioni/input' + str(i + 1) + '.wav', fs, reduced_noise)
         print("Registrazione terminata con successo")
         audio += 1
         i += 1

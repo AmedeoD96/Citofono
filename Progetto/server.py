@@ -1,7 +1,7 @@
 import socket
 import sys
 
-HOST = "192.168.1.13"
+HOST = "192.168.1.20"
 PORT = 8888
 
 # socket.socket mi serve per creare un socket
