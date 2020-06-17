@@ -33,10 +33,11 @@ def read_all_gmms():
 
     data, sr = librosa.load('Registrazioni/input' + str(1000) + '.wav', sr=16000, mono=True)
     data = svt.rms_silence_filter(data)
+    wn = 100.
     fs = 44100.0
-    lowcut = 500.0
-    highcut = 1250.0
-    data = training.butter_bandpass_filter(data, lowcut, highcut, fs, order=6)
+    wn = (2 * wn) / fs
+    b, a = sg.butter(4, wn, 'low')
+    data = sg.filtfilt(b, a, data)
 
     mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
     mfcc = preprocessing.scale(mfcc)  # standardizza il dataset lungo un asse

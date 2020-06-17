@@ -25,13 +25,12 @@ def voice_model(nomefile, audio_number):
         # sr è un numero >0 che indica il tasso di campionamento
         data = svt.rms_silence_filter(data)
 
-        #fr = 44100*16*2
-        #b, a = sg.butter(4, 500. / (fr / 2.), 'low')
-        #data = sg.filtfilt(b, a, data)
+
+        wn = 100.
         fs = 44100.0
-        lowcut = 500.0
-        highcut = 1250.0
-        data = butter_bandpass_filter(data, lowcut, highcut, fs, order=6)
+        wn = (2*wn)/fs
+        b, a = sg.butter(4, wn, 'low')
+        data = sg.filtfilt(b, a, data)
 
         mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
         mfcc = preprocessing.scale(mfcc)
@@ -66,18 +65,6 @@ def remove_wav_files(nomefile, audio_number):
         if os.path.exists('./Registrazioni/' + nomefile + str(i) + '.wav'):
             os.remove('./Registrazioni/' + nomefile + str(i) + '.wav')
     print("rimozione file wav avvenuta")
-
-def butter_bandpass(lowcut, highcut, fs, order=5):
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
-    b, a = sg.butter(order, [low, high], btype='band')
-    return b, a
-
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = sg.lfilter(b, a, data)
-    return y
 
 
 #voice_model('input',3)
