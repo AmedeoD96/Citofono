@@ -8,6 +8,7 @@ from keras.models import load_model
 K.set_image_data_format('channels_first')
 np.set_printoptions(threshold=sys.maxsize)
 
+
 def img_to_encoding(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -19,6 +20,7 @@ def img_to_encoding(img):
     # Estrazione delle features dal modello addestrato
     embedding = model.predict_on_batch(x_train)
     return embedding
+
 
 def triplet_loss(y_true, y_pred, alpha=0.2):
     anchor, positive, negative = y_pred[0], y_pred[1], y_pred[2]

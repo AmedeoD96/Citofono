@@ -17,3 +17,6 @@ def delete_user():
             pickle.dump(db, database, protocol=pickle.HIGHEST_PROTOCOL)
     else:
         print("Non c'è nessun utente con il nome " + name + " presente nel database\n")
+
+
+delete_user()

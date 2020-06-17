@@ -1,25 +1,28 @@
 package it.damelio.amedeo.smartringbell;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
-
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editText;
-    Button button;
-    NotificationOpenHandler notificationOpenHandler;
-    String risposta = "";
+    private Button open, close;
+    private NotificationOpenHandler notificationOpenHandler;
+    private ImageView imageView;
+    private TextView textView;
+
+    final String imgURL = "http://192.168.1.13:5000/get-image/Dataset/sconosciuto.jpg";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.activity_main);
         notificationOpenHandler = new NotificationOpenHandler();
 
@@ -32,18 +35,23 @@ public class MainActivity extends AppCompatActivity {
 
         initUI();
 
-        //risposta = notificationOpenHandler.getRisposta();
-
-        button.setOnClickListener(new View.OnClickListener() {
+        open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                risposta = notificationOpenHandler.getRisposta();
-                if (risposta != null && !risposta.equals("")) {
-                    new SendMessage().execute(risposta);
-                    editText.getText().clear();
-                }else {
-                    new SendMessage().execute("Porca troia non funziona");
-                }
+                new SendMessage().execute("Apri la porta");
+                imageView.setVisibility(View.INVISIBLE);
+                textView.setText("Porta aperta");
+                textView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new SendMessage().execute("Non aprire");
+                imageView.setVisibility(View.INVISIBLE);
+                textView.setText("Porta rimasta chiusa");
+                textView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -51,7 +59,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        editText = findViewById(R.id.editText);
-        button = findViewById(R.id.button);
+        open = findViewById(R.id.button);
+        imageView = findViewById(R.id.imageView);
+        close = findViewById(R.id.download);
+        new DownloadImageTask(imageView).execute(imgURL);
+        textView = findViewById(R.id.textView);
     }
 }

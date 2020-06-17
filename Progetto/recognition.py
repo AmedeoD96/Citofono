@@ -13,13 +13,15 @@ from sklearn.preprocessing import maxabs_scale
 from sklearn.preprocessing import robust_scale
 import time
 from face_trainer import *
+import onesignal
 
 # Variabili riconoscimento voce
 models = []
 speakers = []
-find = False
+
 
 def read_all_gmms():
+    find = False
     fs = 44100
     seconds = 5
     print("Avvio riconoscimento vocale: parla\n")
@@ -84,6 +86,7 @@ def read_all_gmms():
 
 
 def face_recognize():
+    find = read_all_gmms()
     print("Inquadra il tuo volto\n")
     cap = cv2.VideoCapture(0)
     cap.set(3, 640)
@@ -134,9 +137,24 @@ def face_recognize():
                         name = names
             # Se la distanza minima è minore del threshold allora posso aprire la porta
             if min_dist <= 0.4 and find:
+                print(find)
                 print("Porta sbloccata: bentornato " + str(name))
                 break
-
+            else:
+                print("Porta non aperta. Invio della notifica in corso\n")
+                cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
+                send_notification()
+                from server import get_response
+                while get_response() is None:
+                    time.sleep(1)
+                if str(get_response()) == "b'Apri la porta'":
+                    print(get_response())
+                    print("Accesso consentito\n")
+                    break
+                else:
+                    print(get_response())
+                    print("Accesso non consentito\n")
+                    break
         # Attivo la webcam per 5 secondi
         if curr_time - start_time > 5:
             break
@@ -146,14 +164,38 @@ def face_recognize():
 
     cap.release()
     cv2.destroyAllWindows()
+    print(min_dist)
 
+
+"""
     if len(face) == 0:
         print("Nessun volto trovato. Riprova\n")
+        print(min_dist)
     elif len(face) > 1:
         print("Sono stati identificati più volti. Riprova\n")
+        print(min_dist)
     elif min_dist > 0.4:
         print("Volto non riconosciuto. Riprova\n")
+        print(min_dist)
+"""
 
 
-read_all_gmms()
+def send_notification():
+    onesignal_client = onesignal.Client(app_auth_key="N2E4NTNkNzAtYjhjYi00ZTI0LWIzZWUtYTM1YmIyMmQxNzE4",
+                                        app_id="1784a5bd-7107-4bda-b628-a19c2034159e")
+    new_notification = onesignal.Notification(post_body={"contents": {"en": "Qualcuno ha suonato alla tua porta!"}})
+    new_notification.post_body["included_segments"] = ["Active Users"]
+    new_notification.post_body["headings"] = {"en": "Din Dong!"}
+    onesignal_response = onesignal_client.send_notification(new_notification)
+
+    print(onesignal_response.status_code)
+    print(onesignal_response.json())
+
+
+def delete_photo():
+    if os.path.exists("./Dataset/sconosciuto.jpg"):
+        os.remove("./Dataset/sconosciuto.jpg")
+
+
 face_recognize()
+delete_photo()

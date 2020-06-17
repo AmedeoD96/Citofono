@@ -1,7 +1,7 @@
 import socket
 import sys
 
-HOST = "192.168.1.50"
+HOST = "192.168.1.13"
 PORT = 8888
 
 # socket.socket mi serve per creare un socket
@@ -30,5 +30,10 @@ while 1:
     print("Connesso con: " + addr[0] + ":" + str(addr[1]))
     buf = conn.recv(64)
     print(buf)
-
+    if buf is not None:
+        break
 s.close()
+
+
+def get_response():
+    return str(buf)
