@@ -36,7 +36,7 @@ def read_all_gmms():
     wn = 100.
     fs = 44100.0
     wn = (2 * wn) / fs
-    b, a = sg.butter(4, wn, 'low')
+    b, a = sg.butter(1, wn, 'low')
     data = sg.filtfilt(b, a, data)
 
     mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
