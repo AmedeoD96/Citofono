@@ -26,10 +26,11 @@ def voice_model(nomefile, audio_number):
         data = svt.rms_silence_filter(data)
 
 
-        wn = 100.
         fs = 44100.0
-        wn = (2*wn)/fs
-        b, a = sg.butter(1, wn, 'low')
+        nyq = 0.5*fs
+        cutoff = 250
+        normal_cutoff = cutoff / nyq
+        b, a = sg.butter(1, normal_cutoff, 'low')
         data = sg.filtfilt(b, a, data)
 
         mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
