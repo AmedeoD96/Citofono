@@ -1,4 +1,5 @@
 import pickle
+import os
 
 
 # Elimino gli utenti registrati dal db
@@ -9,6 +10,9 @@ def delete_user():
         db = pickle.load(database)
 
     user = db.pop(name, None)
+
+    if os.path.exists("./Trainer/model" + name + ".gmm"):
+        os.remove("./Trainer/model" + name + "gmm")
 
     if user is not None:
         print("Utente " + name + " eliminato con successo\n")
