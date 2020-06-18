@@ -29,7 +29,7 @@ def voice_model(nomefile, audio_number):
         for entry in os.listdir(basepath):
             if os.path.isfile(os.path.join(basepath, entry)):
                 if entry.endswith(".wav"):
-                    AUDIO_FILE = './Registrazioni/' + nomefile + str(i) + '.wav'
+                    AUDIO_FILE = basepath + "/" + entry
 
                     data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
                     # converte l'audio in un vettore di floating point
