@@ -109,6 +109,7 @@ def add_user():
     print("Acquisizione volto completata.\nAvvio acquisizione audio\n")
 
     numero_wav = 3
+    numero_audio_totale = 3
     audio = 0
     i = 0
     while audio < numero_wav:
@@ -119,7 +120,7 @@ def add_user():
         print("Parla")
         myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
         sd.wait()
-        write('./Registrazioni/input' + str(i + 1) + '.wav', fs, myrecording)
+        write('./Registrazioni/' + name + str(i + 1) + '.wav', fs, myrecording)
         print("Registrazione terminata con successo")
         audio += 1
         i += 1
@@ -131,6 +132,7 @@ def add_user():
             if confirm == 'y':
                 numero_wav = int(input('\n Inserisci il numero di audio che vuoi generare: '))
                 audio = 0
+                numero_audio_totale = numero_audio_totale + numero_wav
     print("\nFase di raccolta dati terminata\n")
 
 
