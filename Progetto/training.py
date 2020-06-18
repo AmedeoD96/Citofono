@@ -24,8 +24,19 @@ def voice_model(nomefile, audio_number):
         # data è il vero e proprio vettore di tipo float32
         # sr è un numero >0 che indica il tasso di campionamento
         data = svt.rms_silence_filter(data)
+        """
+        basepath = "./Registrazioni"
+        for entry in os.listdir(basepath):
+            if os.path.isfile(os.path.join(basepath, entry)):
+                if entry.endswith(".wav"):
+                    AUDIO_FILE = './Registrazioni/' + nomefile + str(i) + '.wav'
 
-
+                    data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
+                    # converte l'audio in un vettore di floating point
+                    # data è il vero e proprio vettore di tipo float32
+                    # sr è un numero >0 che indica il tasso di campionamento
+                    data = svt.rms_silence_filter(data)
+                    """
         fs = 44100.0
         nyq = 0.5*fs
         cutoff = 250

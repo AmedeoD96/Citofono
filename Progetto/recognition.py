@@ -91,6 +91,8 @@ def read_all_gmms():
         print("con il valore di", confidenza_audio)
     print("tutti i valori sono:")
     print(((log_likelihood - 55) * 100) / 6)
+    if os.path.exists("./Registrazioni/input1000.wav"):
+        os.remove("./Registrazioni/input1000.wav")
     return find
 
 
