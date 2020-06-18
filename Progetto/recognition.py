@@ -16,6 +16,7 @@ from face_trainer import *
 import onesignal
 import training
 import scipy.signal as sg
+import json
 
 # Variabili riconoscimento voce
 models = []
@@ -155,16 +156,22 @@ def face_recognize():
                 print("Porta non aperta. Invio della notifica in corso\n")
                 cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
                 send_notification()
-                from server import get_response
-                while get_response() is None:
-                    time.sleep(1)
-                if str(get_response()) == "b'Apri la porta'":
-                    print(get_response())
+                while not os.path.exists("risposta.txt"):
+                    time.sleep(0.5)
+                f = open("risposta.txt", "r")
+                line = f.readline()
+                f.close()
+                if line == "Apri la Porta":
+                    print(line)
                     print("Accesso consentito\n")
+                    if os.path.exists("risposta.txt"):
+                        os.remove("risposta.txt")
                     break
                 else:
-                    print(get_response())
+                    print(line)
                     print("Accesso non consentito\n")
+                    if os.path.exists("risposta.txt"):
+                        os.remove("risposta.txt")
                     break
         # Attivo la webcam per 5 secondi
         if curr_time - start_time > 5:

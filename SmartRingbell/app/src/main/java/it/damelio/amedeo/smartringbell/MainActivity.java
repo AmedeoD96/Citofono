@@ -3,11 +3,22 @@ package it.damelio.amedeo.smartringbell;
 import androidx.appcompat.app.AppCompatActivity;
 import com.onesignal.OneSignal;
 import android.os.Bundle;
+import android.renderscript.ScriptIntrinsicBLAS;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,16 +49,19 @@ public class MainActivity extends AppCompatActivity {
         open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                flaskConnection("Apri la Porta");
                 new SendMessage().execute("Apri la porta");
                 imageView.setVisibility(View.INVISIBLE);
                 textView.setText("Porta aperta");
                 textView.setVisibility(View.VISIBLE);
+
             }
         });
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                flaskConnection("Non aprire");
                 new SendMessage().execute("Non aprire");
                 imageView.setVisibility(View.INVISIBLE);
                 textView.setText("Porta rimasta chiusa");
@@ -64,5 +78,44 @@ public class MainActivity extends AppCompatActivity {
         close = findViewById(R.id.download);
         new DownloadImageTask(imageView).execute(imgURL);
         textView = findViewById(R.id.textView);
+    }
+
+
+    private void flaskConnection(final String value){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OutputStream os = null;
+                InputStream is = null;
+                HttpURLConnection conn = null;
+                try {
+                    URL url = new URL("http://192.168.1.13:5000/");
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("risposta", value);
+                    String message = jsonObject.toString();
+
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(15000);
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                    conn.setFixedLengthStreamingMode(message.getBytes().length);
+                    conn.setRequestProperty("Content-Type", "application/json;charset=utf-8");
+                    conn.setRequestProperty("X-Requested-Width", "XMLHttpRequest");
+                    conn.connect();
+                    os = new BufferedOutputStream(conn.getOutputStream());
+                    os.write(message.getBytes());
+                    os.flush();
+                    is = conn.getInputStream();
+
+
+                }catch (IOException | JSONException e){
+                    e.printStackTrace();
+                }finally {
+                    conn.disconnect();
+                }
+            }
+        }).start();
     }
 }
