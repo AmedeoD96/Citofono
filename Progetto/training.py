@@ -11,11 +11,12 @@ import onesignal
 import glob
 import scipy.signal as sg
 import wave
+from string import digits
 
 
-def voice_model(nomefile, audio_number):
+def voice_model():
     results = numpy.asmatrix(())
-
+    """
     for i in range(1, audio_number + 1):
         AUDIO_FILE = './Registrazioni/' + nomefile + str(i) + '.wav'
 
@@ -25,42 +26,44 @@ def voice_model(nomefile, audio_number):
         # sr è un numero >0 che indica il tasso di campionamento
         data = svt.rms_silence_filter(data)
         """
-        basepath = "./Registrazioni"
-        for entry in os.listdir(basepath):
-            if os.path.isfile(os.path.join(basepath, entry)):
-                if entry.endswith(".wav"):
-                    AUDIO_FILE = basepath + "/" + entry
+    basepath = "./Registrazioni/"
+    i = 0
+    for entry in os.listdir(basepath):
+        i += 1
+        if os.path.isfile(os.path.join(basepath, entry)):
+            if entry.endswith(".wav"):
+                if i == 1:
+                    file_name = str(entry[:-5])
+                AUDIO_FILE = basepath + "/" + entry
+                data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
+                # converte l'audio in un vettore di floating point
+                # data è il vero e proprio vettore di tipo float32
+                # sr è un numero >0 che indica il tasso di campionamento
+                data = svt.rms_silence_filter(data)
+                fs = 44100.0
+                nyq = 0.5*fs
+                cutoff = 250
+                normal_cutoff = cutoff / nyq
+                b, a = sg.butter(1, normal_cutoff, 'low')
+                data = sg.filtfilt(b, a, data)
 
-                    data, sr = librosa.load(AUDIO_FILE, sr=16000, mono=True)
-                    # converte l'audio in un vettore di floating point
-                    # data è il vero e proprio vettore di tipo float32
-                    # sr è un numero >0 che indica il tasso di campionamento
-                    data = svt.rms_silence_filter(data)
-                    """
-        fs = 44100.0
-        nyq = 0.5*fs
-        cutoff = 250
-        normal_cutoff = cutoff / nyq
-        b, a = sg.butter(1, normal_cutoff, 'low')
-        data = sg.filtfilt(b, a, data)
+                mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
+                mfcc = preprocessing.scale(mfcc)
+                # Standardizza un dataset su qualunque asse
+                # Standardizzazione di datasets è un requisito comune per molti stimatori in ambito machine-learning
+                # implementati in scikit-learn; potrebbero comportarsi in maniera inaspettata se le features individuali
+                # non fossero standardizzate normalmente con dati distribuiti
+                delta = librosa.feature.delta(mfcc)
+                combined = numpy.hstack((mfcc, delta))
 
-        mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
-        mfcc = preprocessing.scale(mfcc)
-        # Standardizza un dataset su qualunque asse
-        # Standardizzazione di datasets è un requisito comune per molti stimatori in ambito machine-learning
-        # implementati in scikit-learn; potrebbero comportarsi in maniera inaspettata se le features individuali
-        # non fossero standardizzate normalmente con dati distribuiti
-        delta = librosa.feature.delta(mfcc)
-        combined = numpy.hstack((mfcc, delta))
+                mfcc = combined
 
-        mfcc = combined
+                if i == 1:
+                    results = mfcc
+                else:
+                    results = numpy.vstack((results, mfcc))
 
-        if i == 1:
-            results = mfcc
-        else:
-            results = numpy.vstack((results, mfcc))
-
-    model = sklearn.mixture.GaussianMixture(n_components=audio_number + 1, covariance_type='full', n_init=1)
+    model = sklearn.mixture.GaussianMixture(n_components=i, covariance_type='full', n_init=1)
     # classe che permette di stimare i parametri di una gaussian mixture model
     model.fit(results)
     # stima i parametri del modello con l'algoritmo EM
@@ -68,24 +71,17 @@ def voice_model(nomefile, audio_number):
     # la likelihood dei parametri di un modello probabilistico M rispetto ad un insieme di dati s,
     # risultati di un processo stocastico che coinvolge un processo non noto
 
-    filename = './Trainer/model' + nomefile + ".gmm"
+    filename = './Trainer/model' + file_name + ".gmm"
     pickle.dump(model, open(filename, 'wb'))
+    remove_wav_files()
 
 
-def remove_wav_files(nomefile, audio_number):
-    for i in range(1, audio_number + 1):
-        if os.path.exists('./Registrazioni/' + nomefile + str(i) + '.wav'):
-            os.remove('./Registrazioni/' + nomefile + str(i) + '.wav')
-    print("rimozione file wav avvenuta")
-
-
-#voice_model('input',3)
-#remove_wav_files('input', 3)
-
-voice_model('alessandro',3)
-voice_model('amedeo',2)
-voice_model('colucci',2)
-voice_model('lenoci',3)
-voice_model('mamma',2)
-voice_model('papa',2)
-voice_model('pepe',2)
+def remove_wav_files():
+    path = 'Registrazioni'
+    files = glob.glob(path + '/*')
+    for f in files:
+        os.remove(f)
+    if len(os.listdir(path)) == 0:
+        print("Rimozione effettuata con successo\n")
+    else:
+        print("Impossibile eliminare tutti i file\n")

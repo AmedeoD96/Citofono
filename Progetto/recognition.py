@@ -76,13 +76,14 @@ def read_all_gmms():
     print(minmax_scale(log_likelihood))
     print("scale")
     trovato = scale(log_likelihood)
-    if trovato[winner] >= 1:
+    if trovato[winner] >= 1.6:
         print("Trovato\n")
         print(scale(log_likelihood))
         print(speakers[winner])
         find = True
     else:
         print("Non trovato\n")
+        find = False
 
 
     confidenza_audio = (((log_likelihood[winner] - 55) * 100) / 6)
@@ -148,14 +149,17 @@ def face_recognize():
                         min_dist = dist
                         name = names
             # Se la distanza minima è minore del threshold allora posso aprire la porta
-            if min_dist <= 0.4 and find:
+            if min_dist <= 0.52 and find:
+                #TODO fare la funzione per inviare una notifica che qualcuno di CONOSCIUTO è entrato
                 print(find)
                 print("Porta sbloccata: bentornato " + str(name))
+                send_notification(str(name) + " è tornato a casa")
                 break
-            else:
+            elif min_dist <= 52 or find:
+                #TODO fare la funzione, perchè lo usi anche sotto
                 print("Porta non aperta. Invio della notifica in corso\n")
                 cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
-                send_notification()
+                send_notification("Qualcuno è alla porta")
                 while not os.path.exists("risposta.txt"):
                     time.sleep(0.5)
                 f = open("risposta.txt", "r")
@@ -173,6 +177,29 @@ def face_recognize():
                     if os.path.exists("risposta.txt"):
                         os.remove("risposta.txt")
                     break
+            else:
+                # TODO fare una funzione
+                print("Porta non aperta. Invio della notifica in corso\n")
+                cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
+                send_notification("Sconosciuto alla porta")
+                while not os.path.exists("risposta.txt"):
+                    time.sleep(0.5)
+                f = open("risposta.txt", "r")
+                line = f.readline()
+                f.close()
+                if line == "Apri la Porta":
+                    print(line)
+                    print("Accesso consentito\n")
+                    if os.path.exists("risposta.txt"):
+                        os.remove("risposta.txt")
+                    break
+                else:
+                    print(line)
+                    print("Accesso non consentito\n")
+                    if os.path.exists("risposta.txt"):
+                        os.remove("risposta.txt")
+                    break
+
         # Attivo la webcam per 5 secondi
         if curr_time - start_time > 5:
             break
@@ -183,6 +210,7 @@ def face_recognize():
     cap.release()
     cv2.destroyAllWindows()
     print(min_dist)
+    delete_photo()
 
 
 """
@@ -198,10 +226,10 @@ def face_recognize():
 """
 
 
-def send_notification():
+def send_notification(text):
     onesignal_client = onesignal.Client(app_auth_key="N2E4NTNkNzAtYjhjYi00ZTI0LWIzZWUtYTM1YmIyMmQxNzE4",
                                         app_id="1784a5bd-7107-4bda-b628-a19c2034159e")
-    new_notification = onesignal.Notification(post_body={"contents": {"en": "Qualcuno ha suonato alla tua porta!"}})
+    new_notification = onesignal.Notification(post_body={"contents": {"en": text}})
     new_notification.post_body["included_segments"] = ["Active Users"]
     new_notification.post_body["headings"] = {"en": "Din Dong!"}
     onesignal_response = onesignal_client.send_notification(new_notification)
@@ -213,7 +241,3 @@ def send_notification():
 def delete_photo():
     if os.path.exists("./Dataset/sconosciuto.jpg"):
         os.remove("./Dataset/sconosciuto.jpg")
-
-
-face_recognize()
-delete_photo()

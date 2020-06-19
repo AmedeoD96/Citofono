@@ -134,7 +134,3 @@ def add_user():
                 audio = 0
                 numero_audio_totale = numero_audio_totale + numero_wav
     print("\nFase di raccolta dati terminata\n")
-
-
-init_camera()
-add_user()

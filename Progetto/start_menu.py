@@ -1,3 +1,6 @@
+import os
+
+
 def menu():
     print("""
     SmartRingbell
@@ -10,19 +13,33 @@ def menu():
 
     scelta = input()
 
-    if scelta == 1:
-        menu()
+    if scelta == str(1):
         # Aggiungi utente
-    elif scelta == 2:
+        from add_user import add_user
+        add_user()
+        from training import voice_model
+        voice_model()
+        menu()
+    elif scelta == str(2):
         # Elimina utente, poi fase di raccolta dati e infine di training
+        from delete_user import delete_user
+        delete_user()
+        from add_user import add_user
+        add_user()
+        from training import voice_model
+        voice_model()
         menu()
-    elif scelta == 3:
+    elif scelta == str(3):
         # Start server, poi recognition
+        from recognition import face_recognize
+        face_recognize()
         menu()
-    elif scelta == 4:
+    elif scelta == str(4):
         # Delete user
+        from delete_user import delete_user
+        delete_user()
         menu()
-    elif scelta == 5:
+    elif scelta == str(5):
         exit()
 
 
