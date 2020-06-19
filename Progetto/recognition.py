@@ -66,17 +66,18 @@ def read_all_gmms():
         log_likelihood[i] = scores.sum()
         # Compute the media per campione in scala log-likelihood del dato ottenuto
 
-    print(f"Log likelihood: {log_likelihood}")
+    print(f"Log likelihood senza normalizzazione: {log_likelihood}")
     winner = np.argmax(log_likelihood)
     print(" trovato - ", speakers[winner])
     # scaler = MinMaxScaler()
     # scaler.fit(np.asmatrix(log_likelihood))
     # print(scaler.transform(np.asmatrix(log_likelihood)))
-    print("minmax")
+    print("i valori con la normalizzazione minmax")
     print(minmax_scale(log_likelihood))
-    print("scale")
-    trovato = scale(log_likelihood)
-    if trovato[winner] >= 1.6:
+    print("i valori con la normalizzazione scalescale")
+    print(scale(log_likelihood))
+    trovato = log_likelihood
+    if trovato[winner] >= 62:
         print("Trovato\n")
         print(scale(log_likelihood))
         print(speakers[winner])
@@ -86,13 +87,7 @@ def read_all_gmms():
         find = False
 
 
-    confidenza_audio = (((log_likelihood[winner] - 55) * 100) / 6)
-    if (confidenza_audio > 100):
-        print("con il valore di 100%")
-    else:
-        print("con il valore di", confidenza_audio)
-    print("tutti i valori sono:")
-    print(((log_likelihood - 55) * 100) / 6)
+
     if os.path.exists("./Registrazioni/input1000.wav"):
         os.remove("./Registrazioni/input1000.wav")
     return find
