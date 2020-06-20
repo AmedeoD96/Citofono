@@ -86,8 +86,6 @@ def read_all_gmms():
         print("Non trovato\n")
         find = False
 
-
-
     if os.path.exists("./Registrazioni/input1000.wav"):
         os.remove("./Registrazioni/input1000.wav")
     return find
@@ -145,55 +143,14 @@ def face_recognize():
                         name = names
             # Se la distanza minima è minore del threshold allora posso aprire la porta
             if min_dist <= 0.52 and find:
-                #TODO fare la funzione per inviare una notifica che qualcuno di CONOSCIUTO è entrato
                 print(find)
                 print("Porta sbloccata: bentornato " + str(name))
                 send_notification(str(name) + " è tornato a casa")
                 break
-            elif min_dist <= 52 or find:
-                #TODO fare la funzione, perchè lo usi anche sotto
-                print("Porta non aperta. Invio della notifica in corso\n")
-                cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
-                send_notification("Qualcuno è alla porta")
-                while not os.path.exists("risposta.txt"):
-                    time.sleep(0.5)
-                f = open("risposta.txt", "r")
-                line = f.readline()
-                f.close()
-                if line == "Apri la Porta":
-                    print(line)
-                    print("Accesso consentito\n")
-                    if os.path.exists("risposta.txt"):
-                        os.remove("risposta.txt")
-                    break
-                else:
-                    print(line)
-                    print("Accesso non consentito\n")
-                    if os.path.exists("risposta.txt"):
-                        os.remove("risposta.txt")
-                    break
+            elif min_dist <= 0.52 or find:
+                handle_sconosciuto(frame)
             else:
-                # TODO fare una funzione
-                print("Porta non aperta. Invio della notifica in corso\n")
-                cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
-                send_notification("Sconosciuto alla porta")
-                while not os.path.exists("risposta.txt"):
-                    time.sleep(0.5)
-                f = open("risposta.txt", "r")
-                line = f.readline()
-                f.close()
-                if line == "Apri la Porta":
-                    print(line)
-                    print("Accesso consentito\n")
-                    if os.path.exists("risposta.txt"):
-                        os.remove("risposta.txt")
-                    break
-                else:
-                    print(line)
-                    print("Accesso non consentito\n")
-                    if os.path.exists("risposta.txt"):
-                        os.remove("risposta.txt")
-                    break
+                handle_sconosciuto(frame)
 
         # Attivo la webcam per 5 secondi
         if curr_time - start_time > 5:
@@ -204,21 +161,14 @@ def face_recognize():
 
     cap.release()
     cv2.destroyAllWindows()
-    print(min_dist)
     delete_photo()
 
-
-"""
     if len(face) == 0:
         print("Nessun volto trovato. Riprova\n")
         print(min_dist)
     elif len(face) > 1:
         print("Sono stati identificati più volti. Riprova\n")
         print(min_dist)
-    elif min_dist > 0.4:
-        print("Volto non riconosciuto. Riprova\n")
-        print(min_dist)
-"""
 
 
 def send_notification(text):
@@ -231,6 +181,29 @@ def send_notification(text):
 
     print(onesignal_response.status_code)
     print(onesignal_response.json())
+
+
+def handle_sconosciuto(frame):
+    print("Porta non aperta. Invio della notifica in corso\n")
+    cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
+    send_notification("Qualcuno è alla porta")
+    while not os.path.exists("risposta.txt"):
+        time.sleep(0.5)
+    f = open("risposta.txt", "r")
+    line = f.readline()
+    f.close()
+    if line == "Apri la Porta":
+        print(line)
+        print("Accesso consentito\n")
+        if os.path.exists("risposta.txt"):
+            os.remove("risposta.txt")
+        return
+    else:
+        print(line)
+        print("Accesso non consentito\n")
+        if os.path.exists("risposta.txt"):
+            os.remove("risposta.txt")
+        return
 
 
 def delete_photo():

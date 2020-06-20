@@ -1,6 +1,3 @@
-import os
-
-
 def menu():
     print("""
     SmartRingbell
