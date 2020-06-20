@@ -40,6 +40,7 @@ def menu():
     elif scelta == str(5):
         from user_list import get_user_list
         get_user_list()
+        menu()
     elif scelta == str(6):
         exit()
 

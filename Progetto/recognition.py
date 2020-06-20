@@ -77,7 +77,7 @@ def read_all_gmms():
     print("i valori con la normalizzazione scalescale")
     print(scale(log_likelihood))
     trovato = log_likelihood
-    if trovato[winner] >= 62:
+    if round(trovato[winner]) >= 60:
         print("Trovato\n")
         print(scale(log_likelihood))
         print(speakers[winner])
