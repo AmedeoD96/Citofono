@@ -148,9 +148,9 @@ def face_recognize():
                 send_notification(str(name) + " è tornato a casa")
                 break
             elif min_dist <= 0.52 or find:
-                handle_sconosciuto(frame)
+                handle_sconosciuto(frame, "Qualcuno è alla porta")
             else:
-                handle_sconosciuto(frame)
+                handle_sconosciuto(frame, "Sconosciuto alla porta")
 
         # Attivo la webcam per 5 secondi
         if curr_time - start_time > 5:
@@ -183,10 +183,10 @@ def send_notification(text):
     print(onesignal_response.json())
 
 
-def handle_sconosciuto(frame):
+def handle_sconosciuto(frame, notification_message):
     print("Porta non aperta. Invio della notifica in corso\n")
     cv2.imwrite("./Dataset/sconosciuto.jpg", frame)
-    send_notification("Qualcuno è alla porta")
+    send_notification(notification_message)
     while not os.path.exists("risposta.txt"):
         time.sleep(0.5)
     f = open("risposta.txt", "r")
