@@ -5,7 +5,8 @@ def menu():
     2 - Modifica un utente
     3 - Suona il campanello
     4 - Elimina un utente
-    5 - Esci dal Programma
+    5 - Visualizza gli utenti registrati
+    6 - Esci dal Programma
     """)
 
     scelta = input()
@@ -37,6 +38,9 @@ def menu():
         delete_user()
         menu()
     elif scelta == str(5):
+        from user_list import get_user_list
+        get_user_list()
+    elif scelta == str(6):
         exit()
 
 
