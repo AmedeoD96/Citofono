@@ -16,7 +16,9 @@ from face_trainer import *
 import onesignal
 import training
 import scipy.signal as sg
-import json
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+tf.get_logger().setLevel('ERROR')
 
 # Variabili riconoscimento voce
 models = []
@@ -165,10 +167,8 @@ def face_recognize():
 
     if len(face) == 0:
         print("Nessun volto trovato. Riprova\n")
-        print(min_dist)
     elif len(face) > 1:
         print("Sono stati identificati più volti. Riprova\n")
-        print(min_dist)
 
 
 def send_notification(text):

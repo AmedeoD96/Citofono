@@ -7,11 +7,11 @@ import librosa
 import sklearn.mixture
 import numpy
 import pickle
-import onesignal
 import glob
 import scipy.signal as sg
 import wave
-from string import digits
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def voice_model():

@@ -4,6 +4,9 @@ import sys
 import cv2
 from keras import backend as K
 from keras.models import load_model
+import warnings
+warnings.filterwarnings("ignore")
+tf.get_logger().setLevel('ERROR')
 
 K.set_image_data_format('channels_first')
 np.set_printoptions(threshold=sys.maxsize)
