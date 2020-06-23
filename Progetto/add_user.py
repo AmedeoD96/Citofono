@@ -127,7 +127,7 @@ def add_user():
         if audio == numero_wav:
             confirm = input('\nSe vuoi, puoi registare altri file audio per migliorare il riconoscimento.'
                             '\nPremi y se vuoi registrare altri file audio.'
-                            '\nPremi n se non vuoi registrare altri file.')
+                            '\nPremi un altro tasto per terminare.')
             print(confirm)
             if confirm == 'y':
                 numero_wav = int(input('\n Inserisci il numero di audio che vuoi generare: '))
