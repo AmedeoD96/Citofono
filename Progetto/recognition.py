@@ -14,7 +14,6 @@ from sklearn.preprocessing import robust_scale
 import time
 from face_trainer import *
 import onesignal
-import training
 import scipy.signal as sg
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
