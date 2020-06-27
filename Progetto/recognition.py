@@ -34,7 +34,6 @@ def read_all_gmms():
     write('Registrazioni/input' + str(1000) + '.wav', fs, myrecording)
 
     data, sr = librosa.load('Registrazioni/input' + str(1000) + '.wav', sr=16000, mono=True)
-    data = svt.rms_silence_filter(data)
 
     fs = 44100.0
     nyq = 0.5 * fs
@@ -42,6 +41,7 @@ def read_all_gmms():
     normal_cutoff = cutoff / nyq
     b, a = sg.butter(1, normal_cutoff, 'low')
     data = sg.filtfilt(b, a, data)
+    data = svt.rms_silence_filter(data)
 
     mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
     mfcc = preprocessing.scale(mfcc)  # standardizza il dataset lungo un asse

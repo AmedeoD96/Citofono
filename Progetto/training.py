@@ -39,12 +39,13 @@ def voice_model():
                 # converte l'audio in un vettore di floating point
                 # data è il vero e proprio vettore di tipo float32
                 # sr è un numero >0 che indica la frequenza di campionamento
-                data = svt.rms_silence_filter(data)
+
                 nyq = 0.5*sr
                 cutoff = 250
                 normal_cutoff = cutoff / nyq
                 b, a = sg.butter(1, normal_cutoff, 'low')
                 data = sg.filtfilt(b, a, data)
+                data = svt.rms_silence_filter(data)
 
 
                 mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
