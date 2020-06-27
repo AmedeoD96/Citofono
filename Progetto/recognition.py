@@ -27,7 +27,7 @@ speakers = []
 def read_all_gmms():
     find = False
     fs = 44100
-    seconds = 5
+    seconds = 3
     print("Avvio riconoscimento vocale: parla\n")
     myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
     sd.wait()
