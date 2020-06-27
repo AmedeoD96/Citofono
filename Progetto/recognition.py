@@ -19,12 +19,10 @@ import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 tf.get_logger().setLevel('ERROR')
 
-# Variabili riconoscimento voce
-models = []
-speakers = []
-
-
 def read_all_gmms():
+    # Variabili riconoscimento voce
+    models = []
+    speakers = []
     find = False
     fs = 44100
     seconds = 3
@@ -78,7 +76,7 @@ def read_all_gmms():
     print("i valori con la normalizzazione scalescale")
     print(scale(log_likelihood))
     trovato = log_likelihood
-    if round(trovato[winner]) >= 60:
+    if round(trovato[winner]) >= 59:
         print("Trovato\n")
         print(scale(log_likelihood))
         print(speakers[winner])
@@ -89,6 +87,7 @@ def read_all_gmms():
 
     if os.path.exists("./Registrazioni/input1000.wav"):
         os.remove("./Registrazioni/input1000.wav")
+    log_likelihood = []
     return find
 
 
