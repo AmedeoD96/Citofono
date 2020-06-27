@@ -1,5 +1,3 @@
-import cv2
-import numpy as np
 import os
 import sounddevice as sd
 from scipy.io.wavfile import write
@@ -9,8 +7,6 @@ import librosa
 import speaker_verification_toolkit.tools as svt
 from sklearn.preprocessing import minmax_scale
 from sklearn.preprocessing import scale
-from sklearn.preprocessing import maxabs_scale
-from sklearn.preprocessing import robust_scale
 import time
 from face_trainer import *
 import onesignal
@@ -24,21 +20,21 @@ def read_all_gmms():
     models = []
     speakers = []
     find = False
-    fs = 44100
+    frequency_sample = 44100.0
     seconds = 3
+
     print("Avvio riconoscimento vocale: parla\n")
-    myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
+    myrecording = sd.rec(int(seconds * frequency_sample), samplerate=frequency_sample, channels=2)
     sd.wait()
-    write('Registrazioni/input' + str(1000) + '.wav', fs, myrecording)
+    write('Registrazioni/input' + str(1000) + '.wav', frequency_sample, myrecording)
 
     data, sr = librosa.load('Registrazioni/input' + str(1000) + '.wav', sr=16000, mono=True)
 
-    fs = 44100.0
-    nyq = 0.5 * fs
+    nyq = 0.5 * frequency_sample
     cutoff = 250
     normal_cutoff = cutoff / nyq
-    b, a = sg.butter(1, normal_cutoff, 'low')
-    data = sg.filtfilt(b, a, data)
+    numerator, denominator = sg.butter(1, normal_cutoff, 'low')
+    data = sg.filtfilt(numerator, denominator, data)
     data = svt.rms_silence_filter(data)
 
     mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
@@ -50,7 +46,6 @@ def read_all_gmms():
     for entry in os.listdir(basepath):
         if os.path.isfile(os.path.join(basepath, entry)):
             if entry.endswith(".gmm"):
-                # modelpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./models/" + entry)
                 gmm_readed = pickle.load(open(basepath + "/" + entry, 'rb'))
                 speakers.append(entry)
                 models.append(gmm_readed)
@@ -58,23 +53,22 @@ def read_all_gmms():
     log_likelihood = np.zeros(len(models))
 
     for i in range(len(models)):
+        # Calcola la probabilità su scala logaritmica per campione del parametro.
+        # ritorna Log likelihood del Gaussian mixture dato il parametro combined.
         gmm = models[i]
         scores = np.array(gmm.score(combined))
-        # Calcola la probabilità log pesata per campione del parametro.
-        # ritorna Log likelihood del Gaussian mixture dato il parametro combined.
-        log_likelihood[i] = scores.sum()
-        # Compute the media per campione in scala log-likelihood del dato ottenuto
 
-    print(f"Log likelihood senza normalizzazione: {log_likelihood}")
+        # Somma i valori di somiglianza per ogni campione
+        log_likelihood[i] = scores.sum()
+
+    # print(f"Log likelihood senza normalizzazione: {log_likelihood}")
     winner = np.argmax(log_likelihood)
-    print(" trovato - ", speakers[winner])
-    # scaler = MinMaxScaler()
-    # scaler.fit(np.asmatrix(log_likelihood))
-    # print(scaler.transform(np.asmatrix(log_likelihood)))
+    """
     print("i valori con la normalizzazione minmax")
     print(minmax_scale(log_likelihood))
     print("i valori con la normalizzazione scalescale")
     print(scale(log_likelihood))
+    """
     trovato = log_likelihood
     if round(trovato[winner]) >= 59:
         print("Trovato\n")
@@ -175,10 +169,7 @@ def send_notification(text):
     new_notification = onesignal.Notification(post_body={"contents": {"en": text}})
     new_notification.post_body["included_segments"] = ["Active Users"]
     new_notification.post_body["headings"] = {"en": "Din Dong!"}
-    onesignal_response = onesignal_client.send_notification(new_notification)
-
-    print(onesignal_response.status_code)
-    print(onesignal_response.json())
+    onesignal_client.send_notification(new_notification)
 
 
 def handle_sconosciuto(frame, notification_message):
