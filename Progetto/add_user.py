@@ -1,15 +1,10 @@
-import cv2
 from scipy.io.wavfile import write
 import sounddevice as sd
-import fileinput
 from cv2 import *
 import time
 import os
 import pickle
 from face_trainer import *
-import noisereduce as nr
-from scipy.io import wavfile
-import librosa
 
 
 def init_camera():
@@ -27,7 +22,7 @@ def add_user():
     db_path = "./Dataset/embeddings.pickle"
     name = input("\n Inserisci il nome dell'utente: ")
 
-    # Se il database non esiste, lo creo
+    # Controllo se esiste il db
     if os.path.exists(db_path):
         with open(db_path, 'rb') as database:
             db = pickle.load(database)
@@ -103,7 +98,7 @@ def add_user():
         return
 
     # Acquisizione Audio utente
-    fs = 44100
+    frequency_sample = 44100
     seconds = 5
 
     print("Acquisizione volto completata.\nAvvio acquisizione audio\n")
@@ -118,9 +113,10 @@ def add_user():
             print(f"La registrazione inizia tra {j}")
             time.sleep(1)
         print("Parla")
-        myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
+        # Registrazione
+        myrecording = sd.rec(int(seconds * frequency_sample), samplerate=frequency_sample, channels=2)
         sd.wait()
-        write('./Registrazioni/' + name + str(i + 1) + '.wav', fs, myrecording)
+        write('./Registrazioni/' + name + str(i + 1) + '.wav', frequency_sample, myrecording)
         print("Registrazione terminata con successo")
         audio += 1
         i += 1
