@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import font  as tkfont
-#import add_user
+import os
+
 
 class SampleApp(tk.Tk):
 
@@ -53,6 +54,12 @@ class MainMenu(tk.Frame):
         buttonTest.pack()
         buttonExit.pack()
 
+def beginAdding(self):
+    import add_user
+    import subprocess as sub
+
+    add_user.add_user()
+    add_user.update_counter_file()
 
 class PageAdd(tk.Frame):
 
@@ -61,10 +68,12 @@ class PageAdd(tk.Frame):
         self.controller = controller
         label = tk.Label(self, text="Aggiungi Utente", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
+        buttonBegin = tk.Button(self, text="Inizia",
+                           command=lambda: beginAdding(self))
         button = tk.Button(self, text="Ritorna al menu",
                            command=lambda: controller.show_frame("MainMenu"))
+        buttonBegin.pack()
         button.pack()
-
 
 
 class PageRemove(tk.Frame):
