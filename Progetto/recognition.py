@@ -40,7 +40,7 @@ def read_all_gmms():
     data = svt.rms_silence_filter(data)
 
     mfcc = svt.extract_mfcc(data, sr, winlen=0.025, winstep=0.01)
-    mfcc = preprocessing.scale(mfcc)  # standardizza il dataset lungo un asse
+    mfcc = preprocessing.scale(mfcc)  # standardizza il dataset usando la standard scaler
     delta = librosa.feature.delta(mfcc)
     combined = np.hstack((mfcc, delta))
 
