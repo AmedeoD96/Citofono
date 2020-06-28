@@ -1,4 +1,6 @@
 import os
+import numpy as np
+import cv2
 import sounddevice as sd
 from scipy.io.wavfile import write
 import pickle
