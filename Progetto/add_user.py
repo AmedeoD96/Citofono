@@ -99,7 +99,7 @@ def add_user():
 
     # Acquisizione Audio utente
     frequency_sample = 44100
-    seconds = 5
+    seconds = 4
 
     print("Acquisizione volto completata.\nAvvio acquisizione audio\n")
 

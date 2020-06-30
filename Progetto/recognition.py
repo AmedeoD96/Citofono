@@ -22,7 +22,7 @@ def read_all_gmms():
     models = []
     speakers = []
     find = False
-    frequency_sample = 44100.0
+    frequency_sample = 44100
     seconds = 3
 
     print("Avvio riconoscimento vocale: parla\n")
@@ -43,6 +43,8 @@ def read_all_gmms():
     mfcc = preprocessing.scale(mfcc)  # standardizza il dataset usando la standard scaler
     delta = librosa.feature.delta(mfcc)
     combined = np.hstack((mfcc, delta))
+
+    user_name = ""
 
     basepath = "./Trainer"
     for entry in os.listdir(basepath):
@@ -76,6 +78,7 @@ def read_all_gmms():
         print("Trovato\n")
         print(scale(log_likelihood))
         print(speakers[winner])
+        user_name = str(speakers[winner][5:-4])
         find = True
     else:
         print("Non trovato\n")
@@ -84,11 +87,12 @@ def read_all_gmms():
     if os.path.exists("./Registrazioni/input1000.wav"):
         os.remove("./Registrazioni/input1000.wav")
     log_likelihood = []
-    return find
+    print(f"Nome audio: {user_name}")
+    return find, user_name
 
 
 def face_recognize():
-    find = read_all_gmms()
+    find, user_name = read_all_gmms()
     print("Inquadra il tuo volto\n")
     cap = cv2.VideoCapture(0)
     cap.set(3, 640)
@@ -138,15 +142,17 @@ def face_recognize():
                         min_dist = dist
                         name = names
             # Se la distanza minima è minore del threshold allora posso aprire la porta
-            if min_dist <= 0.52 and find:
+            if min_dist <= 0.52 and find and name == user_name:
                 print(find)
                 print("Porta sbloccata: bentornato " + str(name))
                 send_notification(str(name) + " è tornato a casa")
                 break
             elif min_dist <= 0.52 or find:
                 handle_sconosciuto(frame, "Qualcuno è alla porta")
+                break
             else:
                 handle_sconosciuto(frame, "Sconosciuto alla porta")
+                break
 
         # Attivo la webcam per 5 secondi
         if curr_time - start_time > 5:
